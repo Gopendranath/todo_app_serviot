@@ -1,0 +1,68 @@
+### Variables
+@baseUrl = http://localhost:4000/api/v1
+@contentType = application/json
+
+### 1. Health Check
+GET http://localhost:4000/api/health
+Content-Type: {{contentType}}
+
+### 2. Auth - Register
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### 3. Auth - Login
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+### 4. Auth - Get Me (Protected)
+GET {{baseUrl}}/auth/me
+Content-Type: {{contentType}}
+
+### 5. Auth - Logout
+GET {{baseUrl}}/auth/logout
+Content-Type: {{contentType}}
+
+### 6. Todos - Create Todo (Protected)
+POST {{baseUrl}}/todos
+Content-Type: {{contentType}}
+
+{
+  "title": "Complete Backend",
+  "description": "Finish the remaining tasks for the todo backend"
+}
+
+### 7. Todos - Get All Todos (Protected, with Pagination)
+# Default: page=1, limit=10
+GET {{baseUrl}}/todos?page=1&limit=5
+Content-Type: {{contentType}}
+
+### 8. Todos - Get Single Todo (Protected)
+# Replace {{todoId}} with an actual ID from Get All Todos
+@todoId = 69bc3b89a90b8b344097a128
+GET {{baseUrl}}/todos/{{todoId}}
+Content-Type: {{contentType}}
+
+### 9. Todos - Update Todo (Protected)
+PUT {{baseUrl}}/todos/{{todoId}}
+Content-Type: {{contentType}}
+
+{
+  "completed": true
+}
+
+### 10. Todos - Delete Todo (Protected)
+DELETE {{baseUrl}}/todos/{{todoId}}
+Content-Type: {{contentType}}
