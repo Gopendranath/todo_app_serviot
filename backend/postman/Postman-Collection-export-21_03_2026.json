@@ -1,0 +1,316 @@
+{
+  "info": {
+    "_postman_id": "3dbd3e7c-6eb9-4ff5-a451-996c47b093a4",
+    "name": "TODO_APP_SERVIOT",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "id": "b3a7cbe0-add6-4dbb-9ae5-644c436cfc17",
+      "name": "Auth",
+      "item": [
+        {
+          "id": "5cff122f-8229-4cad-94b7-c6432b1efb29",
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"test user 1\",\n  \"email\": \"testUser1@example.com\",\n  \"password\": \"Testpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "00d1b2ba-80e5-45c8-9018-0952218c0ce5",
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "8387e9af-5054-4ff4-86ae-20c0814b082b",
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "me"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "512d7093-9f09-4606-a3be-f08820d35919",
+          "name": "Logout",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ],
+      "variable": []
+    },
+    {
+      "id": "426602a6-1817-4f5c-a20b-5add96be1f1d",
+      "name": "Todo",
+      "item": [
+        {
+          "id": "2d53430c-cf18-4785-b512-be54ee494791",
+          "name": "Create Todo",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Complete Backend\",\n  \"description\": \"Finish the remaining tasks for the todo backend\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/todos",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "f5f0f439-3e06-433a-a748-5e10f6f53a2b",
+          "name": "Get All Todos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos?page=1&limit=5",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos"
+              ],
+              "protocol": "https",
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "disabled": false
+                },
+                {
+                  "key": "limit",
+                  "value": "5",
+                  "disabled": false
+                }
+              ]
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "9d27eb2e-bf10-491e-8069-ab2d35413830",
+          "name": "Get Single Todo",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos/69bc43ea0b0f02306f581dbf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos",
+                "69bc43ea0b0f02306f581dbf"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "85c4b32b-a5a8-414b-b399-df7f2d680049",
+          "name": "Update Todo",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos/69bc43ea0b0f02306f581dbf",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos",
+                "69bc43ea0b0f02306f581dbf"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        },
+        {
+          "id": "36154892-dea8-4e3d-8974-6c27a905b37f",
+          "name": "Delete Todo",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/todos/69bd9ed78aa33be8be592bec",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "todos",
+                "69bd9ed78aa33be8be592bec"
+              ],
+              "protocol": "https"
+            }
+          },
+          "response": [],
+          "event": []
+        }
+      ],
+      "variable": []
+    },
+    {
+      "id": "1de7c495-9407-4a89-9ccc-cd1f3b81eef8",
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/api/health",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api",
+            "health"
+          ],
+          "protocol": "http"
+        }
+      },
+      "response": [],
+      "event": []
+    },
+    {
+      "id": "500abdeb-5d70-4cab-b59c-265ae0f039d2",
+      "name": "Root",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/",
+          "host": [
+            "localhost"
+          ],
+          "path": [],
+          "protocol": "http"
+        }
+      },
+      "response": [],
+      "event": []
+    },
+    {
+      "id": "e40d4af1-7660-4336-a910-1e88fcf4fdbc",
+      "name": "API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:4000/api",
+          "host": [
+            "localhost"
+          ],
+          "path": [
+            "api"
+          ],
+          "protocol": "http"
+        }
+      },
+      "response": [],
+      "event": []
+    }
+  ],
+  "variable": [
+    {
+      "id": "38dfbb9e-8f78-4694-a565-821134d27a19",
+      "key": "baseUrl",
+      "value": "http://localhost:4000/api/v1",
+      "type": "default"
+    }
+  ]
+}
