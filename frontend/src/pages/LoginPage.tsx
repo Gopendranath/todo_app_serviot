@@ -149,7 +149,7 @@ const LoginPage: React.FC = () => {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="max-w-[240px] text-[11px] leading-relaxed text-muted-foreground">
+          <p className="max-w-60 text-[11px] leading-relaxed text-muted-foreground">
             By clicking continue, you agree to our{" "}
             <Link
               to="#"
