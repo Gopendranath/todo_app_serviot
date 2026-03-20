@@ -5,6 +5,7 @@ on:
     branches: [ jadu ]
     paths:
       - 'frontend/**'
+      - 'Caddyfile*'
   pull_request:
     branches: [ jadu ]
     paths:
@@ -75,6 +76,16 @@ jobs:
           target: "/home/ubuntu/todo_app_serviot/frontend/dist"
           strip_components: 1
 
+      - name: Copy Caddyfiles to Server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "Caddyfile*"
+          target: "/home/ubuntu/todo_app_serviot/"
+
       - name: Restart Caddy (Optional)
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -83,6 +94,14 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
+            cd /home/ubuntu/todo_app_serviot
+            caddy fmt --overwrite Caddyfile
+            caddy fmt --overwrite Caddyfile.frontend
+            caddy fmt --overwrite Caddyfile.backend
+            git config user.email "github-actions@github.com"
+            git config user.name "GitHub Actions"
+            git add Caddyfile*
+            git commit -m "chore: format Caddyfiles with caddy fmt" || echo "No changes to commit"
             sudo caddy reload --config /home/ubuntu/todo_app_serviot/Caddyfile
   
   

@@ -5,6 +5,7 @@ on:
     branches: [ jadu ]
     paths:
       - 'backend/**'
+      - 'Caddyfile*'
   pull_request:
     branches: [ jadu ]
     paths:
@@ -57,8 +58,27 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
-            cd /home/ubuntu/todo_app_serviot/backend
+            cd /home/ubuntu/todo_app_serviot
             git pull origin jadu
+            cd backend
             pnpm install --frozen-lockfile
             pnpm build
             pm2 restart todo-backend || pm2 start dist/index.js --name todo-backend
+
+      - name: Restart Caddy (Optional)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            cd /home/ubuntu/todo_app_serviot
+            caddy fmt --overwrite Caddyfile
+            caddy fmt --overwrite Caddyfile.frontend
+            caddy fmt --overwrite Caddyfile.backend
+            git config user.email "github-actions@github.com"
+            git config user.name "GitHub Actions"
+            git add Caddyfile*
+            git commit -m "chore: format Caddyfiles with caddy fmt" || echo "No changes to commit"
+            sudo caddy reload --config /home/ubuntu/todo_app_serviot/Caddyfile

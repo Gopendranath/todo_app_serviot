@@ -1,0 +1,10 @@
+api-todo-serviot.64kbits.com {
+    encode gzip zstd
+
+    log {
+        output file /var/log/caddy/backend.log
+    }
+
+    # Proxy all requests to the backend server
+    reverse_proxy localhost:4000
+}

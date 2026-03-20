@@ -1,0 +1,13 @@
+todo-serviot.64kbits.com {
+    root * /home/ubuntu/todo_app_serviot/frontend/dist
+    encode gzip zstd
+    
+    log {
+        output file /var/log/caddy/frontend.log
+    }
+
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
+}
