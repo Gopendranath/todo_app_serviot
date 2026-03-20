@@ -58,8 +58,17 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
+            # Load user environment to find pnpm/pm2/caddy
+            export PATH="$PATH:$HOME/.local/share/pnpm:$HOME/.nvm/versions/node/v22.14.0/bin:/usr/local/bin"
+            [ -f ~/.bashrc ] && source ~/.bashrc
+            [ -f ~/.profile ] && source ~/.profile
+
             cd /home/ubuntu/todo_app_serviot
-            git pull origin jadu
+            
+            # Use git fetch + reset to avoid "divergent branches" error in CI/CD
+            git fetch origin jadu
+            git reset --hard origin/jadu
+            
             cd backend
             pnpm install --frozen-lockfile
             pnpm build
@@ -73,6 +82,10 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
+            # Load user environment
+            export PATH="$PATH:$HOME/.local/share/pnpm:/usr/local/bin"
+            [ -f ~/.bashrc ] && source ~/.bashrc
+
             cd /home/ubuntu/todo_app_serviot
             caddy fmt --overwrite Caddyfile
             caddy fmt --overwrite Caddyfile.frontend

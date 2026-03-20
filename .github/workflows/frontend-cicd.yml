@@ -94,6 +94,11 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
+            # Load user environment
+            export PATH="$PATH:$HOME/.local/share/pnpm:/usr/local/bin"
+            [ -f ~/.bashrc ] && source ~/.bashrc
+            [ -f ~/.profile ] && source ~/.profile
+
             cd /home/ubuntu/todo_app_serviot
             caddy fmt --overwrite Caddyfile
             caddy fmt --overwrite Caddyfile.frontend
