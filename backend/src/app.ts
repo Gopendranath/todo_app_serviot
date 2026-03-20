@@ -14,11 +14,18 @@ dotenv.config();
 
 const app: Express = express();
 
+// Trust Caddy proxy
+app.set("trust proxy", 1);
+
 // Security Middleware
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:5173",
+    origin: [
+      process.env.CORS_ORIGIN || "http://localhost:5173",
+      "https://todo-serviot.64kbits.com",
+      "https://api-todo-serviot.64kbits.com",
+    ],
     credentials: true,
   }),
 );

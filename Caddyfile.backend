@@ -5,6 +5,20 @@ api-todo-serviot.64kbits.com {
         output file /var/log/caddy/backend.log
     }
 
+    # Security Headers
+    header {
+        # disable FLoC tracking
+        Permissions-Policy "interest-cohort=()"
+        # enable HSTS
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        # prevent clickjacking
+        X-Frame-Options "DENY"
+        # prevent sniffing
+        X-Content-Type-Options "nosniff"
+        # enable XSS protection
+        X-XSS-Protection "1; mode=block"
+    }
+
     # Proxy all requests to the backend server
     reverse_proxy localhost:4000
 }
