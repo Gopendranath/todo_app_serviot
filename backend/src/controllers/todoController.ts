@@ -11,7 +11,10 @@ export const getTodos = asyncHandler(async (req: any, res: Response, next: NextF
   const limit = parseInt(req.query.limit, 10) || 10;
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
+
   const total = await Todo.countDocuments({ user: req.user.id });
+  const completed = await Todo.countDocuments({ user: req.user.id, completed: true });
+  const remaining = total - completed;
 
   const todos = await Todo.find({ user: req.user.id })
     .skip(startIndex)
@@ -39,6 +42,8 @@ export const getTodos = asyncHandler(async (req: any, res: Response, next: NextF
     success: true,
     count: todos.length,
     total,
+    completed,
+    remaining,
     pagination,
     data: todos,
   });

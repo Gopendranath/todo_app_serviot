@@ -1,196 +1,221 @@
-import React, { useEffect, useState } from 'react';
-import { useTodoStore } from '@/store/useTodoStore';
-import { useAuthStore } from '@/store/useAuthStore';
-import { Navigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Trash2, Edit2, Plus, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { Field, FieldLabel } from '@/components/ui/field';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import React, { useEffect, useState } from "react"
+import { useTodoStore } from "@/store/useTodoStore"
+import { useAuthStore } from "@/store/useAuthStore"
+import { Navigate } from "react-router-dom"
+import { Button } from "@/components/ui/button"
+import { Plus, Loader2 } from "lucide-react"
+import { toast } from "sonner"
+import TodoForm from "@/components/todo/TodoForm"
+import TodoList from "@/components/todo/TodoList"
+import TodoPagination from "@/components/todo/TodoPagination"
+import TodoEditDialog from "@/components/todo/TodoEditDialog"
+import { motion } from "framer-motion"
 
 const HomePage: React.FC = () => {
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuthStore();
-  const { todos, isLoading, fetchTodos, addTodo, updateTodo, deleteTodo } = useTodoStore();
-  
-  const [newTodoTitle, setNewTodoTitle] = useState('');
-  const [newTodoDesc, setNewTodoDesc] = useState('');
-  const [editingTodo, setEditingTodo] = useState<{ id: string; title: string; description: string } | null>(null);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuthStore()
+  const {
+    todos,
+    isLoading,
+    fetchTodos,
+    addTodo,
+    updateTodo,
+    deleteTodo,
+    page,
+    limit,
+    total,
+    completed,
+    remaining,
+  } = useTodoStore()
+
+  const [editingTodo, setEditingTodo] = useState<{
+    id: string
+    title: string
+    description: string
+  } | null>(null)
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isAdding, setIsAdding] = useState(false)
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchTodos();
+      fetchTodos(page, limit)
     }
-  }, [isAuthenticated, fetchTodos]);
+  }, [isAuthenticated, page, limit, fetchTodos])
 
   if (isAuthLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <Loader2 className="animate-spin" />
+      <div className="flex h-[60vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
-    );
+    )
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" />
   }
 
-  const handleAddTodo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newTodoTitle.trim()) {
-      toast.error('Title is required');
-      return;
+  const totalPages = Math.ceil(total / limit)
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      fetchTodos(newPage, limit)
     }
-    await addTodo(newTodoTitle, newTodoDesc);
-    setNewTodoTitle('');
-    setNewTodoDesc('');
-    toast.success('Todo added!');
-  };
+  }
+
+  const handleAddTodo = async (title: string, description: string) => {
+    await addTodo(title, description)
+    setIsAdding(false)
+    toast.success("Task added to your list")
+    fetchTodos(page, limit)
+  }
 
   const handleToggleTodo = async (id: string, completed: boolean) => {
-    await updateTodo(id, { completed: !completed });
-  };
+    await updateTodo(id, { completed: !completed })
+    fetchTodos(page, limit)
+  }
 
   const handleDeleteTodo = async (id: string) => {
-    await deleteTodo(id);
-    toast.success('Todo deleted');
-  };
+    await deleteTodo(id)
+    toast.success("Task removed")
+
+    if (todos.length <= 1 && page > 1) {
+      fetchTodos(page - 1, limit)
+    } else {
+      fetchTodos(page, limit)
+    }
+  }
 
   const handleEditTodo = async () => {
-    if (!editingTodo || !editingTodo.title.trim()) return;
-    await updateTodo(editingTodo.id, { 
-      title: editingTodo.title, 
-      description: editingTodo.description 
-    });
-    setIsEditDialogOpen(false);
-    setEditingTodo(null);
-    toast.success('Todo updated');
-  };
+    if (!editingTodo || !editingTodo.title.trim()) {
+      toast.error("Task title cannot be empty")
+      return
+    }
+
+    await updateTodo(editingTodo.id, {
+      title: editingTodo.title,
+      description: editingTodo.description,
+    })
+
+    setIsEditDialogOpen(false)
+    setEditingTodo(null)
+    toast.success("Task updated")
+    fetchTodos(page, limit)
+  }
+
+  const handleUpdateEditingTodo = (
+    data: Partial<{ title: string; description: string }>
+  ) => {
+    setEditingTodo((prev) => (prev ? { ...prev, ...data } : null))
+  }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <Card>
-        <CardHeader>
-          <CardTitle>Add New Todo</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleAddTodo} className="space-y-4">
-            <Field>
-              <FieldLabel>Title</FieldLabel>
-              <Input
-                placeholder="Todo title"
-                value={newTodoTitle}
-                onChange={(e) => setNewTodoTitle(e.target.value)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel>Description</FieldLabel>
-              <Input
-                placeholder="Description (optional)"
-                value={newTodoDesc}
-                onChange={(e) => setNewTodoDesc(e.target.value)}
-              />
-            </Field>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              <Plus className="mr-2 h-4 w-4" /> Add Todo
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-4">
-        <h2 className="text-2xl font-bold">Your Todos</h2>
-        {isLoading && todos.length === 0 ? (
-          <div className="flex justify-center p-8">
-            <Loader2 className="animate-spin" />
-          </div>
-        ) : todos.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No todos yet. Add one above!</p>
-        ) : (
-          <div className="grid gap-4">
-            {todos.map((todo) => (
-              <Card key={todo._id} className={todo.completed ? 'opacity-60' : ''}>
-                <CardContent className="p-4 flex items-center gap-4">
-                  <Checkbox
-                    checked={todo.completed}
-                    onCheckedChange={() => handleToggleTodo(todo._id, todo.completed)}
-                  />
-                  <div className="flex-1">
-                    <h3 className={`font-semibold ${todo.completed ? 'line-through' : ''}`}>
-                      {todo.title}
-                    </h3>
-                    {todo.description && (
-                      <p className="text-sm text-muted-foreground">{todo.description}</p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        setEditingTodo({ 
-                          id: todo._id, 
-                          title: todo.title, 
-                          description: todo.description || '' 
-                        });
-                        setIsEditDialogOpen(true);
-                      }}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDeleteTodo(todo._id)}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-8">
+      {/* Header: Title left, Button right */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-between"
+      >
+        <h2 className="text-4xl font-bold tracking-tight text-foreground">
+          Dashboard
+        </h2>
+        {!isAdding && (
+          <Button
+            onClick={() => setIsAdding(true)}
+            className="h-9 rounded-full bg-primary px-3 text-xs font-bold text-primary-foreground transition-all hover:bg-primary/90 active:scale-95"
+          >
+            <Plus className="mr-1.5 h-4 w-4" /> New Task
+          </Button>
         )}
+      </motion.div>
+
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-0">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.1 }}
+          className="flex flex-col items-center justify-center rounded-sm p-4"
+        >
+          <span className="text-2xl font-bold">{total}</span>
+          <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+            Total
+          </span>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col items-center justify-center rounded-sm p-4"
+        >
+          <span className="text-2xl font-bold">{remaining}</span>
+          <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+            Remaining
+          </span>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col items-center justify-center rounded-sm p-4"
+        >
+          <span className="text-2xl font-bold">{completed}</span>
+          <span className="text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
+            Completed
+          </span>
+        </motion.div>
       </div>
 
-      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Todo</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Field>
-              <FieldLabel>Title</FieldLabel>
-              <Input
-                value={editingTodo?.title || ''}
-                onChange={(e) => setEditingTodo(prev => prev ? { ...prev, title: e.target.value } : null)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel>Description</FieldLabel>
-              <Input
-                value={editingTodo?.description || ''}
-                onChange={(e) => setEditingTodo(prev => prev ? { ...prev, description: e.target.value } : null)}
-              />
-            </Field>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleEditTodo}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
-};
+      {/* Add Todo Form — only renders when isAdding */}
+      <TodoForm
+        onAdd={handleAddTodo}
+        isLoading={isLoading}
+        isAdding={isAdding}
+        setIsAdding={setIsAdding}
+      />
 
-export default HomePage;
+      {/* Todo List */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold tracking-wider text-muted-foreground uppercase">
+            Your Tasks
+          </h3>
+          <span className="rounded-sm bg-muted/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+            Page {page} of {totalPages || 1}
+          </span>
+        </div>
+        <TodoList
+          todos={todos}
+          isLoading={isLoading}
+          onToggle={handleToggleTodo}
+          onDelete={handleDeleteTodo}
+          onEdit={(todo) => {
+            setEditingTodo(todo)
+            setIsEditDialogOpen(true)
+          }}
+          onStartAdding={() => setIsAdding(true)}
+        />
+      </div>
+
+      {/* Pagination */}
+      <TodoPagination
+        page={page}
+        totalPages={totalPages}
+        isLoading={isLoading}
+        onPageChange={handlePageChange}
+      />
+
+      {/* Edit Dialog */}
+      <TodoEditDialog
+        todo={editingTodo}
+        isOpen={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        onSave={handleEditTodo}
+        onUpdate={handleUpdateEditingTodo}
+      />
+    </div>
+  )
+}
+
+export default HomePage

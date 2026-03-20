@@ -1,0 +1,23 @@
+# Caddyfile for todo-app-serviot
+
+:80 {
+    # Set the root directory for the frontend
+    root * ./frontend/dist
+
+    # Serve static files
+    file_server
+
+    # Handle SPA routing (fallback to index.html for unknown routes)
+    try_files {path} /index.html
+
+    # Proxy API requests to the backend
+    reverse_proxy /api/* localhost:4000
+
+    # Enable gzip compression
+    encode gzip zstd
+
+    # Logging
+    log {
+        output file ./caddy.log
+    }
+}

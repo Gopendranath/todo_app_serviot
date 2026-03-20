@@ -23,6 +23,9 @@ const todoSchema = new mongoose.Schema({
   timestamps: true,
 });
 
+// Index for faster queries on user's todos
+todoSchema.index({ user: 1, createdAt: -1 });
+
 const Todo = mongoose.model('Todo', todoSchema);
 
 export default Todo;
