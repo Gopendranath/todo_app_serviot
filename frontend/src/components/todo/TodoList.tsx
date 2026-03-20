@@ -22,7 +22,7 @@ const TodoList: React.FC<TodoListProps> = ({
   onEdit,
   onStartAdding,
 }) => {
-  if (isLoading && todos.length === 0) {
+  if (isLoading && todos?.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center p-20 text-muted-foreground">
         <Loader2 className="mb-4 h-8 w-8 animate-spin" />
@@ -31,7 +31,7 @@ const TodoList: React.FC<TodoListProps> = ({
     )
   }
 
-  if (todos.length === 0) {
+  if (todos?.length === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -62,7 +62,7 @@ const TodoList: React.FC<TodoListProps> = ({
   return (
     <div className="grid gap-2">
       <AnimatePresence mode="popLayout">
-        {todos.map((todo) => (
+        {todos?.map((todo) => (
           <TodoItem
             key={todo._id}
             todo={todo}
