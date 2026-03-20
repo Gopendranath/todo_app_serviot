@@ -9,7 +9,7 @@ todo-serviot.64kbits.com {
     }
 
     # API routes FIRST
-    handle /api/* {
+    handle_path /api/* {
         reverse_proxy localhost:4000
     }
 
