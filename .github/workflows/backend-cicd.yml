@@ -59,9 +59,18 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             # Load user environment to find pnpm/pm2/caddy
-            export PATH="$PATH:$HOME/.local/share/pnpm:$HOME/.nvm/versions/node/v22.14.0/bin:/usr/local/bin"
-            [ -f ~/.bashrc ] && source ~/.bashrc
-            [ -f ~/.profile ] && source ~/.profile
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Add pnpm home to path if not already there
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            case ":$PATH:" in
+              *":$PNPM_HOME:"*) ;;
+              *) export PATH="$PNPM_HOME:$PATH" ;;
+            esac
+
+            # Ensure pm2 is also in path (if installed globally via nvm)
+            # nvm use v22 --silent || nvm use default --silent
 
             cd /home/ubuntu/todo_app_serviot
             
@@ -83,8 +92,15 @@ jobs:
           port: ${{ secrets.SERVER_PORT || 22 }}
           script: |
             # Load user environment
-            export PATH="$PATH:$HOME/.local/share/pnpm:/usr/local/bin"
-            [ -f ~/.bashrc ] && source ~/.bashrc
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            
+            # Add pnpm home to path if not already there
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            case ":$PATH:" in
+              *":$PNPM_HOME:"*) ;;
+              *) export PATH="$PNPM_HOME:$PATH" ;;
+            esac
 
             cd /home/ubuntu/todo_app_serviot
             caddy fmt --overwrite Caddyfile
